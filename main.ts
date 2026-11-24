@@ -1,7 +1,7 @@
 // Alien Field Notes: The Two Day Earth Review
 // Writes one original line — an alien tourist's review of planet Earth
 // after two days — to <output dir>/entry.txt. Deterministic, no network.
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const LINE =
@@ -15,5 +15,14 @@ const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
 mkdirSync(outDir, { recursive: true });
 const target = join(outDir, "entry.txt");
 writeFileSync(target, LINE, "utf8");
+
+// Read back and verify the output is exactly the expected line.
+const back = readFileSync(target, "utf8");
+if (back !== LINE) {
+  throw new Error("output mismatch: entry.txt does not match the expected line");
+}
+if (back.length < 1 || back.length > 200) {
+  throw new Error(`output is ${back.length} chars, outside the 1-200 char limit`);
+}
 console.log(`wrote ${target} (${LINE.length} chars)`);
 console.log(LINE);
